@@ -1,0 +1,15 @@
+[package]
+name = "aoc2021"
+version = "0.1.0"
+authors = ["Florian Vallée <florian@vallee.xyz>"]
+edition = "2021"
+
+[dependencies]
+aoc-runner = "*" 
+aoc-runner-derive = "*"
+#counter = "0.5.2"
+#regex = "1"
+itertools = "*"
+#rayon = "1.5.0"
+lazy_static = "*"
+#rc-dlist-deque = "1.0.0"
