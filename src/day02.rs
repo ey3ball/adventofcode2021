@@ -20,8 +20,24 @@ pub fn part1(moves: &[Moves]) -> i64 {
             match dir.as_str() {
                 "forward" => (x + val, y),
                 "backward" => (x - val, y),
-                "down" => (x, y - val),
-                "up" => (x, y + val),
+                "down" => (x, y + val),
+                "up" => (x, y - val),
+                _ => panic!("unsupported move")
+            }
+        });
+    pos.0 * pos.1
+}
+
+#[aoc(day2, part2)]
+pub fn part2(moves: &[Moves]) -> i64 {
+    let pos = moves
+        .iter()
+        .fold((0,0,0), |(x, y, aim), (dir, val)| {
+            match dir.as_str() {
+                "forward" => (x + val, y + val*aim, aim),
+                "backward" => (x - val, y, aim),
+                "down" => (x, y, aim + val),
+                "up" => (x, y, aim - val),
                 _ => panic!("unsupported move")
             }
         });
