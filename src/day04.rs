@@ -104,3 +104,30 @@ pub fn part1((draw, cards): &Bingo) -> u32 {
         .sum::<u32>()
         * drawn
 }
+
+#[aoc(day4, part2)]
+pub fn part2((draw, cards): &Bingo) -> u32 {
+    let mut cards = cards.clone();
+    let mut bag = draw.iter();
+    let mut drawn = 0;
+    let last: Option<Card> = None;
+
+    while cards.len() != 1 {
+        drawn = *bag.next().unwrap();
+        cards.iter_mut().for_each(|c| {c.bingo(drawn);});
+        cards.retain(|c| c.win.is_none())
+    };
+
+    while cards[0].win.is_none() {
+        drawn = *bag.next().unwrap();
+        cards[0].bingo(drawn);
+    }
+    cards[0] 
+        .grid
+        .iter()
+        .enumerate()
+        .filter(|&(i, _)| !cards[0].check[i])
+        .map(|(_, v)| v)
+        .sum::<u32>()
+        * drawn
+}
