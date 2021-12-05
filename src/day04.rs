@@ -114,15 +114,17 @@ pub fn part2((draw, cards): &Bingo) -> u32 {
 
     while cards.len() != 1 {
         drawn = *bag.next().unwrap();
-        cards.iter_mut().for_each(|c| {c.bingo(drawn);});
+        cards.iter_mut().for_each(|c| {
+            c.bingo(drawn);
+        });
         cards.retain(|c| c.win.is_none())
-    };
+    }
 
     while cards[0].win.is_none() {
         drawn = *bag.next().unwrap();
         cards[0].bingo(drawn);
     }
-    cards[0] 
+    cards[0]
         .grid
         .iter()
         .enumerate()
