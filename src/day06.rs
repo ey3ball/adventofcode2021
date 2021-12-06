@@ -34,8 +34,7 @@ pub fn part2(fish: &Vec<u32>) -> usize {
     let mut history: Vec<usize> = vec![];
     history.push(fish.len());
 
-    for day in 1..=256 {
-        //println!("day {:?}", fish);
+    for _day in 1..=10 {
         let mut ready = 0;
         for f in fish.iter_mut() {
             if *f == 0 {
@@ -45,31 +44,18 @@ pub fn part2(fish: &Vec<u32>) -> usize {
                 *f -= 1;
             }
         }
-
-        if day > 10 {
-            ready += history[day - 7] - history[day - 8];
-        }
-
         for _new in 0..ready {
             fish.push(8);
         }
+        history.push(fish.len());
+    }
 
-        let count_old = if day <= 10 {
-            fish.iter().filter(|&&c| c < 7).count()
-        } else {
-            history[day - 10] + fish.iter().filter(|&&c| c < 7).count()
-        };
-        let count_new = fish.iter().filter(|&&c| c >= 7).count();
-        history.push(count_old + count_new);
-        if day == 10 {
-            fish = fish[history[0]..].iter().copied().collect();
-        } else if day > 10 {
-            fish = fish.iter().skip_while(|&&c| c == 6).copied().collect();
-        } else {
-            println!("day {}: {}", day, count_old + count_new);
-        }
-        println!("day {}: {}", day, count_old + count_new);
-        println!("{}", fish.len());
+    let mut count = history[10];
+    for day in 11..=256 {
+        let ready = (history[day - 7] - history[day - 8]) + (history[day - 9] - history[day - 10]);
+
+        count += ready;
+        history.push(count);
     }
     history.pop().unwrap()
 }
