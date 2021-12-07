@@ -1,14 +1,11 @@
 #[aoc_generator(day6)]
 pub fn generator(input: &str) -> Vec<u32> {
-    input
-        .split(",")
-        .map(|f| f.parse().unwrap())
-        .collect()
+    input.split(",").map(|f| f.parse().unwrap()).collect()
 }
 
 #[aoc(day6, part1)]
 pub fn part1(fish: &Vec<u32>) -> usize {
-    let mut fish = fish.clone(); 
+    let mut fish = fish.clone();
 
     for _day in 1..=80 {
         let mut ready = 0;
@@ -30,7 +27,7 @@ pub fn part1(fish: &Vec<u32>) -> usize {
 
 #[aoc(day6, part2)]
 pub fn part2(fish: &Vec<u32>) -> usize {
-    let mut fish = fish.clone(); 
+    let mut fish = fish.clone();
     let mut history: Vec<usize> = vec![];
     history.push(fish.len());
 

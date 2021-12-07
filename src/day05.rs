@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use regex::Regex;
+use std::collections::HashMap;
 type Coords = (i32, i32);
 
 #[derive(Debug)]
@@ -40,7 +40,7 @@ impl Lines {
     }
 
     fn is_straight(&self) -> bool {
-        return self.eq_slope.0 == 0 || self.eq_slope.1 == 0
+        return self.eq_slope.0 == 0 || self.eq_slope.1 == 0;
     }
 
     fn trace(&self) -> Vec<Coords> {
@@ -82,9 +82,9 @@ pub fn part1(lines: &Vec<Lines>) -> usize {
     let mut map: HashMap<Coords, u32> = HashMap::new();
 
     for l in lines.iter().filter(|l| l.is_straight()) {
-        l.trace()
-            .iter()
-            .for_each(|coord| {map.insert(*coord, map.get(coord).unwrap_or(&0) + 1);} );
+        l.trace().iter().for_each(|coord| {
+            map.insert(*coord, map.get(coord).unwrap_or(&0) + 1);
+        });
     }
 
     map.values().filter(|&&v| v >= 2).count()
@@ -95,9 +95,9 @@ pub fn part2(lines: &Vec<Lines>) -> usize {
     let mut map: HashMap<Coords, u32> = HashMap::new();
 
     for l in lines.iter() {
-        l.trace()
-            .iter()
-            .for_each(|coord| {map.insert(*coord, map.get(coord).unwrap_or(&0) + 1);} );
+        l.trace().iter().for_each(|coord| {
+            map.insert(*coord, map.get(coord).unwrap_or(&0) + 1);
+        });
     }
 
     map.values().filter(|&&v| v >= 2).count()
