@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 #[derive(Debug)]
 pub struct HeightMap {
     xmax: i32,
@@ -8,12 +10,15 @@ pub struct HeightMap {
 impl HeightMap {
     fn pt(&self, index: usize) -> (i32, i32) {
         let index = index as i32;
-        return (index % self.xmax, (index - (index % self.xmax)) / self.xmax)
+        (index % self.xmax, (index - (index % self.xmax)) / self.xmax)
     }
     fn idx(&self, pt: (i32, i32)) -> usize {
-        return (pt.0 + pt.1 * self.xmax).try_into().unwrap()
+        (pt.0 + pt.1 * self.xmax).try_into().unwrap()
     }
 
+    fn val(&self, pt: (i32, i32)) -> i8 {
+        self.arr[self.idx(pt)]
+    }
 
     fn neigh<'a>(&'a self, pt: (i32, i32)) -> impl Iterator<Item=(i32, i32)> + 'a {
         (pt.0-1..=pt.0+1)
@@ -51,9 +56,48 @@ pub fn part1(input: &HeightMap) -> isize {
         .enumerate()
         .filter(|(i, &val)| {
             input.neigh_vals(input.pt(*i))
-                 .all(|neigh_val| neigh_val >= val)
+                 .all(|neigh_val| neigh_val > val)
         })
         .map(|(_i, val)| (val + 1) as isize)
         .sum()
 }
 
+pub fn grow(input: &HeightMap, basin: HashSet<(i32,i32)>) -> HashSet<(i32, i32)> {
+    let grown: HashSet<(i32, i32)> =
+        basin
+            .iter()
+            .flat_map(|&pt| input.neigh(pt).filter(|&neigh| input.val(neigh) != 9))
+            .collect();
+    if basin == &basin | &grown {
+        basin
+    } else {
+        grow(input, &basin | &grown)
+    }
+}
+
+#[aoc(day9, part2)]
+pub fn part2(input: &HeightMap) -> usize {
+    let low_points: Vec<(i32,i32)> = input.arr
+        .iter()
+        .enumerate()
+        .filter(|(i, &val)| {
+            input.neigh_vals(input.pt(*i))
+                 .all(|neigh_val| neigh_val > val)
+        })
+        .map(|(i, _val)| input.pt(i))
+        .collect();
+
+    let mut basin_sizes: Vec<usize> = low_points
+        .iter()
+        .map(|&pt| {
+            let mut basin = HashSet::new();
+            basin.insert(pt);
+            basin = grow(input, basin);
+            basin.iter().count()
+        })
+        .collect();
+
+    basin_sizes.sort();
+
+    basin_sizes.iter().rev().take(3).product()
+}
