@@ -4,7 +4,7 @@ use std::collections::HashSet;
 pub struct HeightMap {
     xmax: i32,
     ymax: i32,
-    arr: Vec<i8>
+    arr: Vec<i8>,
 }
 
 impl HeightMap {
@@ -20,21 +20,19 @@ impl HeightMap {
         self.arr[self.idx(pt)]
     }
 
-    fn neigh<'a>(&'a self, pt: (i32, i32)) -> impl Iterator<Item=(i32, i32)> + 'a {
-        (pt.0-1..=pt.0+1)
+    fn neigh(&self, pt: (i32, i32)) -> impl Iterator<Item = (i32, i32)> + '_ {
+        (pt.0 - 1..=pt.0 + 1)
             .filter(|&x| (0..self.xmax).contains(&x))
             .flat_map(move |x| {
-                (pt.1-1..=pt.1+1)
+                (pt.1 - 1..=pt.1 + 1)
                     .filter(|&y| (0..self.ymax).contains(&y))
-                    .map(move |y| (x,y))
+                    .map(move |y| (x, y))
             })
-            .filter(move |&(x_,y_)| {
-                (x_ == pt.0) ^ (y_ == pt.1)
-            }) 
+            .filter(move |&(x_, y_)| (x_ == pt.0) ^ (y_ == pt.1))
     }
 
-    fn neigh_vals<'a>(&'a self, pt: (i32, i32)) -> impl Iterator<Item=i8> + 'a {
-        return self.neigh(pt).map(|neigh_pt| self.arr[self.idx(neigh_pt)])
+    fn neigh_vals(&self, pt: (i32, i32)) -> impl Iterator<Item = i8> + '_ {
+        return self.neigh(pt).map(|neigh_pt| self.arr[self.idx(neigh_pt)]);
     }
 }
 
@@ -46,28 +44,33 @@ pub fn generator(input: &str) -> HeightMap {
         .flat_map(|l| l.chars())
         .map(|c| c.to_digit(10).unwrap() as i8)
         .collect();
-    HeightMap { xmax: cols as i32, ymax: lines as i32, arr: map}
+    HeightMap {
+        xmax: cols as i32,
+        ymax: lines as i32,
+        arr: map,
+    }
 }
 
 #[aoc(day9, part1)]
 pub fn part1(input: &HeightMap) -> isize {
-    input.arr
+    input
+        .arr
         .iter()
         .enumerate()
         .filter(|(i, &val)| {
-            input.neigh_vals(input.pt(*i))
-                 .all(|neigh_val| neigh_val > val)
+            input
+                .neigh_vals(input.pt(*i))
+                .all(|neigh_val| neigh_val > val)
         })
         .map(|(_i, val)| (val + 1) as isize)
         .sum()
 }
 
-pub fn grow(input: &HeightMap, basin: HashSet<(i32,i32)>) -> HashSet<(i32, i32)> {
-    let grown: HashSet<(i32, i32)> =
-        basin
-            .iter()
-            .flat_map(|&pt| input.neigh(pt).filter(|&neigh| input.val(neigh) != 9))
-            .collect();
+pub fn grow(input: &HeightMap, basin: HashSet<(i32, i32)>) -> HashSet<(i32, i32)> {
+    let grown: HashSet<(i32, i32)> = basin
+        .iter()
+        .flat_map(|&pt| input.neigh(pt).filter(|&neigh| input.val(neigh) != 9))
+        .collect();
     if basin == &basin | &grown {
         basin
     } else {
@@ -77,12 +80,14 @@ pub fn grow(input: &HeightMap, basin: HashSet<(i32,i32)>) -> HashSet<(i32, i32)>
 
 #[aoc(day9, part2)]
 pub fn part2(input: &HeightMap) -> usize {
-    let low_points: Vec<(i32,i32)> = input.arr
+    let low_points: Vec<(i32, i32)> = input
+        .arr
         .iter()
         .enumerate()
         .filter(|(i, &val)| {
-            input.neigh_vals(input.pt(*i))
-                 .all(|neigh_val| neigh_val > val)
+            input
+                .neigh_vals(input.pt(*i))
+                .all(|neigh_val| neigh_val > val)
         })
         .map(|(i, _val)| input.pt(i))
         .collect();
