@@ -11,7 +11,7 @@ pub fn score(c: char) -> usize {
         ']' => 57,
         '}' => 1197,
         '>' => 25137,
-        _ => panic!("Unexpected char")
+        _ => panic!("Unexpected char"),
     }
 }
 
@@ -21,19 +21,17 @@ pub fn score_auto(c: char) -> usize {
         ']' => 2,
         '}' => 3,
         '>' => 4,
-        _ => panic!("Unexpected char")
+        _ => panic!("Unexpected char"),
     }
 }
 
-
 pub fn parse(line: &Vec<char>) -> Result<Vec<char>, usize> {
-    let closed_by: HashMap<char, char> = HashMap::from_iter([
-            ('(', ')'),
-            ('[', ']'),
-            ('{', '}'),
-            ('<', '>')
-        ].iter().copied());
-    let opened_by: HashMap<char, char> = closed_by.iter().map(|(&k,&v)| (v,k)).collect();
+    let closed_by: HashMap<char, char> = HashMap::from_iter(
+        [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')]
+            .iter()
+            .copied(),
+    );
+    let opened_by: HashMap<char, char> = closed_by.iter().map(|(&k, &v)| (v, k)).collect();
     let mut chunks: Vec<Vec<char>> = vec![];
     let mut state: Vec<char> = vec![];
     let mut chunk: Vec<char> = vec![];
@@ -47,9 +45,7 @@ pub fn parse(line: &Vec<char>) -> Result<Vec<char>, usize> {
         } else if opened_by.contains_key(&c) {
             match state.pop() {
                 Some(s) if s == opened_by[&c] => chunk.push(c),
-                _ => {
-                    return Err(score(c))
-                },
+                _ => return Err(score(c)),
             };
         } else {
             panic!("Unknown token");
@@ -62,7 +58,7 @@ pub fn parse(line: &Vec<char>) -> Result<Vec<char>, usize> {
             chunks.push(chunk);
             chunk = vec![];
         }
-    };
+    }
     if state.is_empty() {
         chunks.push(chunk);
     }
@@ -81,12 +77,11 @@ pub fn part1(input: &Vec<Vec<char>>) -> usize {
 
 #[aoc(day10, part2)]
 pub fn part2(input: &Vec<Vec<char>>) -> usize {
-    let closed_by: HashMap<char, char> = HashMap::from_iter([
-            ('(', ')'),
-            ('[', ']'),
-            ('{', '}'),
-            ('<', '>')
-        ].iter().copied());
+    let closed_by: HashMap<char, char> = HashMap::from_iter(
+        [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')]
+            .iter()
+            .copied(),
+    );
 
     let mut scores: Vec<usize> = input
         .iter()
@@ -98,9 +93,7 @@ pub fn part2(input: &Vec<Vec<char>>) -> usize {
                 .iter()
                 .rev()
                 .map(|c| closed_by[c])
-                .fold(0, |score, c| {
-                    score * 5 + score_auto(c)
-                })
+                .fold(0, |score, c| score * 5 + score_auto(c))
         })
         .collect();
     scores.sort_unstable();
