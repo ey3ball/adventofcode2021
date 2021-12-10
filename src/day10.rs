@@ -15,7 +15,18 @@ pub fn score(c: char) -> usize {
     }
 }
 
-pub fn parse(line: &Vec<char>) -> Result<Vec<Vec<char>>, usize> {
+pub fn score_auto(c: char) -> usize {
+    match c {
+        ')' => 1,
+        ']' => 2,
+        '}' => 3,
+        '>' => 4,
+        _ => panic!("Unexpected char")
+    }
+}
+
+
+pub fn parse(line: &Vec<char>) -> Result<Vec<char>, usize> {
     let closed_by: HashMap<char, char> = HashMap::from_iter([
             ('(', ')'),
             ('[', ']'),
@@ -55,7 +66,7 @@ pub fn parse(line: &Vec<char>) -> Result<Vec<Vec<char>>, usize> {
     if state.is_empty() {
         chunks.push(chunk);
     }
-    Ok(chunks)
+    Ok(state)
 }
 
 #[aoc(day10, part1)]
@@ -66,4 +77,32 @@ pub fn part1(input: &Vec<Vec<char>>) -> usize {
         .filter(|p| p.is_err())
         .map(|p| p.unwrap_err())
         .sum()
+}
+
+#[aoc(day10, part2)]
+pub fn part2(input: &Vec<Vec<char>>) -> usize {
+    let closed_by: HashMap<char, char> = HashMap::from_iter([
+            ('(', ')'),
+            ('[', ']'),
+            ('{', '}'),
+            ('<', '>')
+        ].iter().copied());
+
+    let mut scores: Vec<usize> = input
+        .iter()
+        .map(|l| parse(l))
+        .filter(|p| p.is_ok())
+        .map(|p| {
+            let state = p.unwrap();
+            state
+                .iter()
+                .rev()
+                .map(|c| closed_by[c])
+                .fold(0, |score, c| {
+                    score * 5 + score_auto(c)
+                })
+        })
+        .collect();
+    scores.sort_unstable();
+    scores[scores.len() / 2]
 }
