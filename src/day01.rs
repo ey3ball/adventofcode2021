@@ -1,11 +1,14 @@
+use wasm_bindgen::prelude::*;
 use itertools::Itertools;
 
 #[aoc_generator(day1)]
+#[wasm_bindgen]
 pub fn generator(input: &str) -> Vec<i32> {
     input.lines().map(|x| x.parse().unwrap()).collect()
 }
 
 #[aoc(day1, part1)]
+#[wasm_bindgen]
 pub fn part1(depths: &[i32]) -> usize {
     let d1 = &depths[0..depths.len() - 1];
     let d2 = &depths[1..depths.len()];

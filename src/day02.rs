@@ -1,6 +1,8 @@
+use wasm_bindgen::prelude::*;
 type Moves = (String, i64);
 
 #[aoc_generator(day2)]
+#[wasm_bindgen]
 pub fn generator(input: &str) -> Vec<Moves> {
     input
         .lines()
@@ -13,6 +15,7 @@ pub fn generator(input: &str) -> Vec<Moves> {
 }
 
 #[aoc(day2, part1)]
+#[wasm_bindgen]
 pub fn part1(moves: &[Moves]) -> i64 {
     let pos = moves
         .iter()
