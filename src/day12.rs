@@ -15,7 +15,7 @@ pub fn parse(input: &str) -> Caves {
 }
 
 pub fn explore<'a>(input: &'a Caves, twice: bool) -> Vec<Vec<&'a str>> {
-    let mut paths: Vec<(bool, Vec<&str>)> = vec![(false, vec!["start"])];
+    let mut paths: Vec<(bool, Vec<&str>)> = vec![(!twice, vec!["start"])];
 
     loop {
         let mut next_paths: Vec<(bool, Vec<&str>)> = vec![];
