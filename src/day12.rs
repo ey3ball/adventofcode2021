@@ -1,16 +1,14 @@
 use std::collections::HashMap;
-type Caves = HashMap<String, Vec<String>>;
+type Caves<'a> = HashMap<&'a str, Vec<&'a str>,>;
 
-#[aoc_generator(day12)]
-pub fn generator(input: &str) -> Caves {
+pub fn parse(input: &str) -> Caves {
     let mut caves: Caves = HashMap::new();
-    caves.insert("end".to_owned(), vec![]);
+    caves.insert("end", vec![]);
     input
         .lines()
         .for_each(|l| {
             let (from, to) = l.split_once("-").unwrap();
-            let (from, to) = (from.to_owned(), to.to_owned());
-            caves.entry(from.clone()).or_insert(vec![]).push(to.clone());
+            caves.entry(from).or_insert(vec![]).push(to);
             if to != "end" && from != "start" {
                 caves.entry(to).or_insert(vec![]).push(from);
             }
@@ -18,23 +16,23 @@ pub fn generator(input: &str) -> Caves {
     caves
 }
 
-pub fn explore(input: &Caves, twice: bool) -> Vec<Vec<String>> {
-    let mut paths: Vec<(bool, Vec<String>)> = vec![(false, vec!["start".to_owned()])];
+pub fn explore<'a>(input: &'a Caves, twice: bool) -> Vec<Vec<&'a str>> {
+    let mut paths: Vec<(bool, Vec<&str>)> = vec![(false, vec!["start"])];
 
     loop {
-        let mut next_paths: Vec<(bool, Vec<String>)> = vec![];
+        let mut next_paths: Vec<(bool, Vec<&str>)> = vec![];
         paths
             .iter()
             .for_each(|(detour_taken, path)| {
                 let last = path.iter().last().unwrap();
-                if last == "end" {
+                if last == &"end" {
                     next_paths.push((*detour_taken, path.clone()));
                 } else {
                     let options = &input[last];
                     options
                         .iter()
                         .filter(|next| next == &&next.to_ascii_uppercase() || !path.contains(next) || !detour_taken)
-                        .filter(|next| next != &"start")
+                        .filter(|next| next != &&"start")
                         .for_each(|valid_next| {
                             let mut new_path = path.clone();
                             let detour = if new_path.contains(valid_next) && &valid_next.to_ascii_uppercase() != valid_next {
@@ -60,13 +58,15 @@ pub fn explore(input: &Caves, twice: bool) -> Vec<Vec<String>> {
 }
 
 #[aoc(day12, part1)]
-pub fn part1(input: &Caves) -> usize {
-    let paths = explore(input, false);
+pub fn part1(input: &str) -> usize {
+    let caves = parse(input);
+    let paths = explore(&caves, false);
     paths.len()
 }
 
 #[aoc(day12, part2)]
-pub fn part2(input: &Caves) -> usize {
-    let paths = explore(input, true);
+pub fn part2(input: &str) -> usize {
+    let caves = parse(input);
+    let paths = explore(&caves, true);
     paths.len()
 }
