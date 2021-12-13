@@ -11,11 +11,12 @@ pub fn display(grid: &HashSet<(i32, i32)>) {
                 if grid.contains(&(x,y)) {
                     '#'
                 } else {
-                    '.'
+                    ' '
                 }
             }).collect();
         println!("{}", row);
     }
+    println!("");
 }
 
 #[aoc_generator(day13)]
@@ -40,14 +41,41 @@ pub fn parse(input: &str) -> Parsed {
     (dots, instructions)
 }
 
+pub fn paperfold(sheet: &HashSet<(i32, i32)>, axis: char, value: i32) -> HashSet<(i32, i32)> {
+    sheet
+        .iter()
+        .filter(|(x,y)| {
+            if axis == 'x' {
+                x != &value
+            } else {
+                y != &value
+            }
+        })
+        .map(|(x,y)| {
+            if axis == 'x' && x > &value {
+                (2 * value - x, *y)
+            } else if axis == 'y' && y > &value {
+                (*x, 2 * value - y)
+            } else {
+                (*x, *y)
+            }
+        })
+        .collect()
+}
+
 #[aoc(day13, part1)]
-pub fn part1(input: &Parsed) -> usize {
-    println!("{:?}", input);
-    display(&input.0);
-    0
+pub fn part1(input: &Parsed) -> i32 {
+    let sheet = paperfold(&input.0, input.1[0].0, input.1[0].1);
+    sheet.iter().count() as i32
 }
 
 #[aoc(day13, part2)]
-pub fn part2(input: &Parsed) -> usize {
+pub fn part2(input: &Parsed) -> i32 {
+    let sheet = input.1
+        .iter()
+        .fold(input.0.clone(), |sheet, instructions| {
+            paperfold(&sheet, instructions.0, instructions.1)
+        });
+    display(&sheet);
     0
 }
