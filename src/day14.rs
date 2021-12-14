@@ -23,7 +23,7 @@ pub fn generator(input: &str) -> Input {
 pub fn stats(polymer: &Vec<char>) -> usize {
     let mut stats: Vec<(char, usize)> = polymer.iter().counts_by(|x| *x).into_iter().collect();
     stats.sort_by(|(_, count), (_, count_2)| count.partial_cmp(count_2).unwrap());
-    println!("{:?}", stats);
+    // println!("{:?}", stats);
     stats.iter().last().unwrap().1 - stats.iter().next().unwrap().1
 }
 
@@ -35,7 +35,7 @@ pub fn stats2(first: char, seqs: &HashMap<(char, char), usize>) -> usize {
     });
     let mut stats: Vec<(char, usize)> = stats.iter().map(|(k, v)| (*k, *v)).collect();
     stats.sort_by(|(_, count), (_, count_2)| count.partial_cmp(count_2).unwrap());
-    println!("{:?}", stats);
+    // println!("{:?}", stats);
     stats.iter().last().unwrap().1 - stats.iter().next().unwrap().1
 }
 
@@ -56,7 +56,7 @@ pub fn part1(input: &Input) -> usize {
             next_state.push(win[1]);
         });
         state = next_state;
-        stats(&state);
+        // stats(&state);
     }
     stats(&state)
 }
@@ -83,7 +83,7 @@ pub fn part2(input: &Input) -> usize {
             *counter += count;
         });
         state = next_state;
-        stats2(input.0[0], &state);
+        // stats2(input.0[0], &state);
     }
     stats2(input.0[0], &state)
 }
