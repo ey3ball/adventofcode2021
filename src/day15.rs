@@ -77,42 +77,72 @@ pub fn generator(input: &str) -> Cavern {
 
 pub fn explore(input: &Cavern) -> i32 {
     let mut dst: HashMap<usize, Option<i32>> = HashMap::new();
-    let mut visited: HashSet<usize> = HashSet::new();
+    let mut to_visit: BinaryHeap<(i32, usize)> = BinaryHeap::new();
+    to_visit.push((0, 0));
     dst.insert(0, Some(0));
 
     loop {
-        let next_point = 
-            (&dst.keys().copied().collect() - &visited)
-                .iter()
-                .min_by_key(|k| {
-                    dst.get(k).unwrap()
-                })
-                .copied();
+        let (from_risk,  next_point) = match to_visit.pop() {
+            Some(risk_point) => (-risk_point.0, risk_point.1),
+            _ => break,
+        };
 
-        if next_point.is_none() {
+        if next_point == input.arr.len() - 1 {
             break;
         }
-        let next_point = next_point.unwrap();
-        // println!("visiting {:?} {}", input.pt(next_point), dst[&next_point].unwrap());
 
-        let from_risk = dst[&next_point].unwrap();
+        if from_risk != dst.get(&next_point).unwrap().unwrap()  {
+            continue;
+        }
+
         input
             .neigh_vals(next_point)
             .iter()
             .for_each(|(idx, risk)| {
                 match dst.entry(*idx).or_insert(None) {
-                    None => {
+                    Some(val) if val <= &mut(from_risk + risk) => (),
+                    _ => {
                         dst.insert(*idx, Some(from_risk + risk));
+                        to_visit.push((-(from_risk + risk), *idx));
                     },
-                    Some(val) if val > &mut(from_risk + risk) => {
-                        *val = from_risk + risk;
-                    },
-                    _ => ()
                 };
             });
-        visited.insert(next_point);
     };
     dst.get(&(input.arr.len() - 1)).unwrap().unwrap()
+}
+
+pub fn grow(input: &Cavern) -> Cavern {
+    let factor = 5;
+    let xmax = (input.xmax * factor) as i32;
+    let ymax = (input.ymax * factor) as i32;
+
+    let mut big = Cavern {
+        xmax: xmax as i32,
+        ymax: ymax as i32,
+        arr: vec![0; (xmax * ymax) as usize]
+    };
+
+    for y in 0..input.ymax {
+        for repeat in 0..factor {
+            for x in 0..input.xmax {
+                let new_idx = big.idx((x + repeat * input.xmax, y));
+                let old_idx = input.idx((x,y));
+                big.arr[new_idx] = (input.arr[old_idx] + repeat - 1) % 9 + 1;
+            }
+        }
+    }
+
+    for repeat in 1..factor {
+        for y in 0..input.ymax {
+            for x in 0..big.xmax {
+                let from_idx = big.idx((x, y));
+                let to_idx = big.idx((x, y + repeat * input.ymax));
+                big.arr[to_idx] = (big.arr[from_idx] + repeat - 1) % 9 + 1;
+            }
+        }
+    }
+
+    big
 }
 
 #[aoc(day15, part1)]
@@ -121,6 +151,7 @@ pub fn part1(input: &Cavern) -> i32 {
 }
 
 #[aoc(day15, part2)]
-pub fn part2(input: &Cavern) -> usize {
-    0
+pub fn part2(input: &Cavern) -> i32 {
+    let bigger_input = grow(input);
+    explore(&bigger_input)
 }
