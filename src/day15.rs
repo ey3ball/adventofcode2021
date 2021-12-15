@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use std::collections::HashMap;
+use std::collections::BinaryHeap;
 
 #[derive(Debug, Clone)]
 pub struct Cavern {
@@ -27,14 +27,10 @@ impl Cavern {
     }
 
     fn neigh(&self, pt: (i32, i32)) -> Vec<(i32, i32)> {
-        (pt.0 - 1..=pt.0 + 1)
-            .filter(|&x| (0..self.xmax).contains(&x))
-            .flat_map(move |x| {
-                (pt.1 - 1..=pt.1 + 1)
-                    .filter(|&y| (0..self.ymax).contains(&y))
-                    .map(move |y| (x, y))
-            })
-            .filter(|&(x_, y_)| (x_ == pt.0) ^ (y_ == pt.1))
+        [(1, 0), (-1, 0), (0, 1), (0, -1)]
+            .iter()
+            .map(|(dx, dy)| (pt.0 + dx, pt.1 + dy))
+            .filter(|(x, y)| (0..self.xmax).contains(x) && (0..self.ymax).contains(y))
             .collect()
     }
 
