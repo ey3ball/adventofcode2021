@@ -8,21 +8,30 @@ type ParseState<'a> = (&'a[u8], usize);
 #[derive(Debug, PartialEq)]
 pub struct Packet {
     version: usize,
+    kind: u8,
     op: PacketOp
+}
+
+#[derive(Debug, PartialEq)]
+pub enum PacketOp {
+    Literal(u64),
+    Operator(Vec<Packet>)
 }
 
 impl Packet {
     fn literal(version: usize, val: u64) -> Packet {
         Packet {
             version,
-            op: PacketOp::Literal(val)
+            op: PacketOp::Literal(val),
+            kind: 4
         }
     }
 
     fn op(version: usize, packets: Vec<Packet>) -> Packet {
         Packet {
             version,
-            op: PacketOp::Operator(packets)
+            op: PacketOp::Operator(packets),
+            kind: 0
         }
     }
 
@@ -32,12 +41,24 @@ impl Packet {
             PacketOp::Operator(ps) => ps.iter().map(|p| p.sum()).sum()
         }
     }
-}
 
-#[derive(Debug, PartialEq)]
-pub enum PacketOp {
-    Literal(u64),
-    Operator(Vec<Packet>)
+    fn eval(&self) -> usize {
+        match &self.op {
+            PacketOp::Literal(val) => *val as usize,
+            PacketOp::Operator(ps) => {
+                match self.kind {
+                    0 => ps.iter().map(|p| p.eval()).sum(),
+                    1 => ps.iter().map(|p| p.eval()).product(),
+                    2 => ps.iter().map(|p| p.eval()).min().unwrap(),
+                    3 => ps.iter().map(|p| p.eval()).max().unwrap(),
+                    5 => if ps[0].eval() > ps[1].eval() { 1 } else { 0 },
+                    6 => if ps[0].eval() < ps[1].eval() { 1 } else { 0 },
+                    7 => if ps[0].eval() == ps[1].eval() { 1 } else { 0 },
+                    _ => panic!("unsupported packet kind")
+                }
+            }
+        }
+    }
 }
 
 #[aoc_generator(day16)]
@@ -110,17 +131,17 @@ pub fn parse_literal(i: ParseState) -> IResult<ParseState, PacketOp> {
 }
 
 pub fn parse_packet(i: ParseState) -> IResult<ParseState, Packet> {
-    let (i, (version, type_id)) = parse_header(i)?;
+    let (i, (version, kind)) = parse_header(i)?;
 
-    println!("Read Packet Header version={} type={}", version, type_id);
+    println!("Read Packet Header version={} type={}", version, kind);
 
-    let (i, op) = if type_id != 4 {
+    let (i, op) = if kind != 4 {
         parse_operator(i)?
     } else {
         parse_literal(i)?
     };
 
-    Ok((i, Packet { version, op }))
+    Ok((i, Packet { version, kind, op }))
 }
 
 #[aoc(day16, part1)]
@@ -128,6 +149,13 @@ pub fn part1(input: &[u8]) -> usize {
     let output: IResult<&[u8], Packet> = bits(parse_packet)(input);
     output.unwrap().1.sum()
 }
+
+#[aoc(day16, part2)]
+pub fn part2(input: &[u8]) -> usize {
+    let output: IResult<&[u8], Packet> = bits(parse_packet)(input);
+    output.unwrap().1.eval()
+}
+
 
 #[cfg(test)]
 mod tests {
