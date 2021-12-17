@@ -1,21 +1,21 @@
-use nom::bits::{bits, complete::take, complete::tag};
+use nom::bits::{bits, complete::tag, complete::take};
 use nom::bytes;
 use nom::error::Error;
 use nom::IResult;
 
-type ParseState<'a> = (&'a[u8], usize);
+type ParseState<'a> = (&'a [u8], usize);
 
 #[derive(Debug, PartialEq)]
 pub struct Packet {
     version: usize,
     kind: u8,
-    op: PacketOp
+    op: PacketOp,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum PacketOp {
     Literal(u64),
-    Operator(Vec<Packet>)
+    Operator(Vec<Packet>),
 }
 
 impl Packet {
@@ -23,7 +23,7 @@ impl Packet {
         Packet {
             version,
             op: PacketOp::Literal(val),
-            kind: 4
+            kind: 4,
         }
     }
 
@@ -31,32 +31,49 @@ impl Packet {
         Packet {
             version,
             op: PacketOp::Operator(packets),
-            kind: 0
+            kind: 0,
         }
     }
 
     fn sum(&self) -> usize {
-        self.version + match &self.op {
-            PacketOp::Literal(_) => 0,
-            PacketOp::Operator(ps) => ps.iter().map(|p| p.sum()).sum()
-        }
+        self.version
+            + match &self.op {
+                PacketOp::Literal(_) => 0,
+                PacketOp::Operator(ps) => ps.iter().map(|p| p.sum()).sum(),
+            }
     }
 
     fn eval(&self) -> usize {
         match &self.op {
             PacketOp::Literal(val) => *val as usize,
-            PacketOp::Operator(ps) => {
-                match self.kind {
-                    0 => ps.iter().map(|p| p.eval()).sum(),
-                    1 => ps.iter().map(|p| p.eval()).product(),
-                    2 => ps.iter().map(|p| p.eval()).min().unwrap(),
-                    3 => ps.iter().map(|p| p.eval()).max().unwrap(),
-                    5 => if ps[0].eval() > ps[1].eval() { 1 } else { 0 },
-                    6 => if ps[0].eval() < ps[1].eval() { 1 } else { 0 },
-                    7 => if ps[0].eval() == ps[1].eval() { 1 } else { 0 },
-                    _ => panic!("unsupported packet kind")
+            PacketOp::Operator(ps) => match self.kind {
+                0 => ps.iter().map(|p| p.eval()).sum(),
+                1 => ps.iter().map(|p| p.eval()).product(),
+                2 => ps.iter().map(|p| p.eval()).min().unwrap(),
+                3 => ps.iter().map(|p| p.eval()).max().unwrap(),
+                5 => {
+                    if ps[0].eval() > ps[1].eval() {
+                        1
+                    } else {
+                        0
+                    }
                 }
-            }
+                6 => {
+                    if ps[0].eval() < ps[1].eval() {
+                        1
+                    } else {
+                        0
+                    }
+                }
+                7 => {
+                    if ps[0].eval() == ps[1].eval() {
+                        1
+                    } else {
+                        0
+                    }
+                }
+                _ => panic!("unsupported packet kind"),
+            },
         }
     }
 }
@@ -109,7 +126,7 @@ pub fn parse_operator(i: ParseState) -> IResult<ParseState, PacketOp> {
             packets.push(packet);
         }
     };
-    Ok((i,PacketOp::Operator(packets)))
+    Ok((i, PacketOp::Operator(packets)))
 }
 
 pub fn parse_literal(i: ParseState) -> IResult<ParseState, PacketOp> {
@@ -127,7 +144,7 @@ pub fn parse_literal(i: ParseState) -> IResult<ParseState, PacketOp> {
     }
     println!("Parsed Literal Packet {}", value);
 
-    Ok((i,PacketOp::Literal(value)))
+    Ok((i, PacketOp::Literal(value)))
 }
 
 pub fn parse_packet(i: ParseState) -> IResult<ParseState, Packet> {
@@ -156,7 +173,6 @@ pub fn part2(input: &[u8]) -> usize {
     output.unwrap().1.eval()
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -172,8 +188,8 @@ mod tests {
         let bytes = generator("38");
         let output: IResult<&[u8], (usize, u8)> = bits(parse_header)(&bytes);
         let output = output.unwrap();
-    assert_eq!(output.1.0, 1);
-    assert_eq!(output.1.1, 6);
+        assert_eq!(output.1 .0, 1);
+        assert_eq!(output.1 .1, 6);
     }
 
     #[test]
@@ -181,7 +197,7 @@ mod tests {
         let bytes = generator("D2FE28");
         let output: IResult<&[u8], Packet> = bits(parse_packet)(&bytes);
         let output = output.unwrap();
-        assert_eq!(output.1, Packet::literal(6,2021));
+        assert_eq!(output.1, Packet::literal(6, 2021));
     }
 
     #[test]
@@ -189,7 +205,10 @@ mod tests {
         let bytes = generator("38006F45291200");
         let output: IResult<&[u8], Packet> = bits(parse_packet)(&bytes);
         let output = output.unwrap();
-        assert_eq!(output.1, Packet::op(1, vec![Packet::literal(6, 10),Packet::literal(2, 20)]))
+        assert_eq!(
+            output.1,
+            Packet::op(1, vec![Packet::literal(6, 10), Packet::literal(2, 20)])
+        )
     }
 
     #[test]
@@ -197,7 +216,17 @@ mod tests {
         let bytes = generator("EE00D40C823060");
         let output: IResult<&[u8], Packet> = bits(parse_packet)(&bytes);
         let output = output.unwrap();
-        assert_eq!(output.1, Packet::op(7, vec![Packet::literal(2, 1),Packet::literal(4, 2),Packet::literal(1, 3)]))
+        assert_eq!(
+            output.1,
+            Packet::op(
+                7,
+                vec![
+                    Packet::literal(2, 1),
+                    Packet::literal(4, 2),
+                    Packet::literal(1, 3)
+                ]
+            )
+        )
     }
 
     fn get_sum(input: &str) -> usize {

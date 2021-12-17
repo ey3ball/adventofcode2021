@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::collections::BinaryHeap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct Cavern {
@@ -82,7 +82,7 @@ pub fn explore(input: &Cavern) -> i32 {
     dst.insert(0, Some(0));
 
     loop {
-        let (from_risk,  next_point) = match to_visit.pop() {
+        let (from_risk, next_point) = match to_visit.pop() {
             Some(risk_point) => (-risk_point.0, risk_point.1),
             _ => break,
         };
@@ -91,23 +91,20 @@ pub fn explore(input: &Cavern) -> i32 {
             break;
         }
 
-        if from_risk != dst.get(&next_point).unwrap().unwrap()  {
+        if from_risk != dst.get(&next_point).unwrap().unwrap() {
             continue;
         }
 
-        input
-            .neigh_vals(next_point)
-            .iter()
-            .for_each(|(idx, risk)| {
-                match dst.entry(*idx).or_insert(None) {
-                    Some(val) if val <= &mut(from_risk + risk) => (),
-                    _ => {
-                        dst.insert(*idx, Some(from_risk + risk));
-                        to_visit.push((-(from_risk + risk), *idx));
-                    },
-                };
-            });
-    };
+        input.neigh_vals(next_point).iter().for_each(|(idx, risk)| {
+            match dst.entry(*idx).or_insert(None) {
+                Some(val) if val <= &mut (from_risk + risk) => (),
+                _ => {
+                    dst.insert(*idx, Some(from_risk + risk));
+                    to_visit.push((-(from_risk + risk), *idx));
+                }
+            };
+        });
+    }
     dst.get(&(input.arr.len() - 1)).unwrap().unwrap()
 }
 
@@ -119,14 +116,14 @@ pub fn grow(input: &Cavern) -> Cavern {
     let mut big = Cavern {
         xmax: xmax as i32,
         ymax: ymax as i32,
-        arr: vec![0; (xmax * ymax) as usize]
+        arr: vec![0; (xmax * ymax) as usize],
     };
 
     for y in 0..input.ymax {
         for repeat in 0..factor {
             for x in 0..input.xmax {
                 let new_idx = big.idx((x + repeat * input.xmax, y));
-                let old_idx = input.idx((x,y));
+                let old_idx = input.idx((x, y));
                 big.arr[new_idx] = (input.arr[old_idx] + repeat - 1) % 9 + 1;
             }
         }
