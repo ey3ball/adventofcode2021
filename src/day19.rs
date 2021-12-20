@@ -95,9 +95,9 @@ impl std::ops::Add for Pos {
 
     fn add(self, other: Self) -> Self::Output {
         Self {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: self.z - other.z,
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
         }
     }
 }
@@ -105,17 +105,12 @@ impl std::ops::Add for Pos {
 impl Scanner {
     pub fn most_likely(&self, other: &Scanner) -> Option<(usize, Pos)> {
         let mut matches: Vec<(usize, usize, usize, usize, Pos)> = self
-            .rebases(other)
+            .pairings(other)
             .iter()
             .map(|(which_from, which_to, which_rot, s2_s1)| {
-                let other_beacons: HashSet<Pos> = other
-                    .beacons
-                    .iter()
-                    .map(|b| b.rot(*which_rot).unwrap() + *s2_s1)
-                    .collect();
-
                 (
-                    other_beacons
+                    other
+                        .rebase(*which_rot, *s2_s1)
                         .iter()
                         .filter(|ob| self.beacons.contains(&ob))
                         .count(),
@@ -129,6 +124,10 @@ impl Scanner {
             .collect();
         matches.sort();
 
+        for m in matches.iter() {
+            println!("=:{} b1:{} b2:{} rot:{} d:{:?}", m.0, m.1, m.2, m.3, m.4);
+        }
+
         if matches.len() > 0 {
             let m = matches[0];
             println!("=:{} b1:{} b2:{} rot:{}", m.0, m.1, m.2, m.3);
@@ -138,7 +137,10 @@ impl Scanner {
         }
     }
 
-    pub fn rebases(&self, other: &Scanner) -> Vec<(usize, usize, usize, Pos)> {
+    /* Generate all possible coordinates pairings between both scanners
+     * (each beacon of self paired with each beacon with other for all possible rotations),
+     * then return the corresponding base change vector */
+    pub fn pairings(&self, other: &Scanner) -> Vec<(usize, usize, usize, Pos)> {
         self.beacons
             .iter()
             .enumerate()
@@ -154,6 +156,10 @@ impl Scanner {
                     })
             })
             .collect()
+    }
+
+    pub fn rebase(&self, rot: usize, rel: Pos) -> Vec<Pos> {
+        self.beacons.iter().map(|pos| pos.rot(rot).unwrap() - rel).collect()
     }
 }
 
@@ -173,10 +179,22 @@ pub fn part1(input: &Vec<Scanner>) -> usize {
     //    }
     //}
 
-    input[0].most_likely(&input[1]);
-    input[0].most_likely(&input[2]);
-    input[0].most_likely(&input[3]);
-    input[0].most_likely(&input[4]);
-    input[4].most_likely(&input[1]);
+    let (rot, rel) = input[0].most_likely(&input[1]).unwrap();
+    println!("{:?}", input[1].beacons);
+    println!("{:?}", rel);
+    let new_scan1 = Scanner {
+        beacons: input[1].rebase(rot, rel),
+        base: None,
+        rot: None
+    };
+    println!("===");
+    println!("{:?}", new_scan1.beacons);
+
+    let (rot2, rel2) = input[4].most_likely(&new_scan1).unwrap();
+    let new_scan4 = input[4].rebase(rot2, rel2);
+    println!("{:?}", rot2);
+    println!("---4---");
+    println!("{:?}", new_scan4);
+
     0
 }
