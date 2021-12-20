@@ -130,3 +130,32 @@ pub fn part1(input: &Map) -> usize {
     image.arr.iter().count()
 }
 
+#[aoc(day20, part2)]
+pub fn part2(input: &Map) -> usize {
+    let mut image = input.clone();
+    for _i in 0..50 {
+        let transform = image
+            .coords()
+            .iter()
+            .filter_map(|pt| {
+                let val = image.codec.get(&image.coeff(*pt)).unwrap();
+                if *val {
+                    Some(*pt)
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        image.arr = transform;
+        image.grow();
+        if !image.bg {
+            image.bg = *image.codec.get(&0).unwrap();
+        } else {
+            image.bg = *image.codec.get(&511).unwrap();
+        }
+    }
+
+    image.arr.iter().count()
+}
+
