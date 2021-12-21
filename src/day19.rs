@@ -43,29 +43,76 @@ pub fn parse(input: &str) -> Vec<Scanner> {
 }
 
 impl Pos {
-    fn rots(&self) -> impl Iterator<Item = Pos> + '_ {
+    fn rev_rots(&self) -> impl Iterator<Item = Pos> + '_ {
         // Generate coordinates for all possible scanner alignemnts
+        //
         [
             [self.x, self.y, self.z],
-            [self.x, self.z, self.y],
-            [self.y, self.z, self.x],
-            [self.y, self.x, self.z],
+            [self.x, -self.z, self.y],
+            [self.x, -self.y, -self.z],
+            [self.x, self.z, -self.y],
             [self.z, self.x, self.y],
-            [self.z, self.y, self.x],
+            [self.y, self.x, -self.z],
+            [-self.z, self.x, -self.y],
+            [-self.y, self.x, self.z],
+            [self.y, self.z, self.x],
+            [-self.z, self.y, self.x],
+            [-self.y, -self.z, self.x],
+            [self.z, -self.y, self.x],
+
+            [-self.x, self.z, self.y],
+            [-self.x, self.y, -self.z],
+            [-self.x, -self.z, -self.y],
+            [-self.x, -self.y, self.z],
+            [self.y, -self.x, self.z],
+            [-self.z, -self.x, self.y],
+            [-self.y, -self.x, -self.z],
+            [self.z, -self.x, -self.y],
+            [self.z, self.y, -self.x],
+            [self.y, -self.z, -self.x],
+            [-self.z, -self.y, -self.x],
+            [-self.y, self.z, -self.x],
         ]
         .into_iter()
-        .flat_map(|xyz| {
-            [
-                [xyz[0], xyz[1], xyz[2]],
-                [-xyz[0], xyz[1], xyz[2]],
-                [xyz[0], -xyz[1], xyz[2]],
-                [-xyz[0], -xyz[1], xyz[2]],
-                [xyz[0], xyz[1], -xyz[2]],
-                [-xyz[0], xyz[1], -xyz[2]],
-                [xyz[0], -xyz[1], -xyz[2]],
-                [-xyz[0], -xyz[1], -xyz[2]],
-            ]
+        .map(|xyz| Pos {
+            x: xyz[0],
+            y: xyz[1],
+            z: xyz[2],
         })
+    }
+
+
+    fn rots(&self) -> impl Iterator<Item = Pos> + '_ {
+        // Generate coordinates for all possible scanner alignemnts
+        //
+        [
+            [self.x, self.y, self.z],
+            [self.x, self.z, -self.y],
+            [self.x, -self.y, -self.z],
+            [self.x, -self.z, self.y],
+            [self.y, self.z, self.x],
+            [self.y, self.x, -self.z],
+            [self.y, -self.z, -self.x],
+            [self.y, -self.x, self.z],
+            [self.z, self.x, self.y],
+            [self.z, self.y, -self.x],
+            [self.z, -self.x, -self.y],
+            [self.z, -self.y, self.x],
+
+            [-self.x, self.z, self.y],
+            [-self.x, self.y, -self.z],
+            [-self.x, -self.z, -self.y],
+            [-self.x, -self.y, self.z],
+            [-self.y, self.x, self.z],
+            [-self.y, self.z, -self.x],
+            [-self.y, -self.x, -self.z],
+            [-self.y, -self.z, self.x],
+            [-self.z, self.y, self.x],
+            [-self.z, self.x, -self.y],
+            [-self.z, -self.y, -self.x],
+            [-self.z, -self.x, self.y],
+        ]
+        .into_iter()
         .map(|xyz| Pos {
             x: xyz[0],
             y: xyz[1],
@@ -74,8 +121,13 @@ impl Pos {
     }
 
     fn rot(&self, n: usize) -> Option<Pos> {
-        return self.rots().nth(n);
+        self.rots().nth(n)
     }
+
+    fn rev_rot(&self, n: usize) -> Option<Pos> {
+        self.rev_rots().nth(n)
+    }
+
 }
 
 impl std::ops::Sub for Pos {
@@ -150,7 +202,7 @@ impl Scanner {
                     .iter()
                     .enumerate()
                     .flat_map(move |(to_idx, to_b)| {
-                        to_b.rots().enumerate().map(move |(rot_idx, to_b_rot)| {
+                        to_b.rev_rots().enumerate().map(move |(rot_idx, to_b_rot)| {
                             (from_idx, to_idx, rot_idx, to_b_rot - *from_b)
                         })
                     })
@@ -159,7 +211,7 @@ impl Scanner {
     }
 
     pub fn rebase(&self, rot: usize, rel: Pos) -> Vec<Pos> {
-        self.beacons.iter().map(|pos| pos.rot(rot).unwrap() - rel).collect()
+        self.beacons.iter().map(|pos| pos.rev_rot(rot).unwrap() - rel).collect()
     }
 }
 
@@ -181,7 +233,8 @@ pub fn part1(input: &Vec<Scanner>) -> usize {
 
     let (rot, rel) = input[0].most_likely(&input[1]).unwrap();
     println!("{:?}", input[1].beacons);
-    println!("{:?}", rel);
+    println!("{:?}", rel.rot(rot).unwrap());
+    println!("{:?}", Pos{x:0, y:0, z:0} - rel);
     let new_scan1 = Scanner {
         beacons: input[1].rebase(rot, rel),
         base: None,
@@ -192,7 +245,10 @@ pub fn part1(input: &Vec<Scanner>) -> usize {
 
     let (rot2, rel2) = input[4].most_likely(&new_scan1).unwrap();
     let new_scan4 = input[4].rebase(rot2, rel2);
-    println!("{:?}", rot2);
+    println!("{:?}", input[4]);
+    println!("{:?}", rel2);
+    println!("{:?}", rel2.rot(rot2));
+    println!("{:?}", Pos{x:0, y:0, z:0} - rel2);
     println!("---4---");
     println!("{:?}", new_scan4);
 
