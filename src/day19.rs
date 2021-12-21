@@ -59,7 +59,6 @@ impl Pos {
             [-self.z, self.y, self.x],
             [-self.y, -self.z, self.x],
             [self.z, -self.y, self.x],
-
             [-self.x, self.z, self.y],
             [-self.x, self.y, -self.z],
             [-self.x, -self.z, -self.y],
@@ -81,7 +80,6 @@ impl Pos {
         })
     }
 
-
     fn rots(&self) -> impl Iterator<Item = Pos> + '_ {
         // Generate coordinates for all possible scanner alignemnts
         //
@@ -98,7 +96,6 @@ impl Pos {
             [self.z, self.y, -self.x],
             [self.z, -self.x, -self.y],
             [self.z, -self.y, self.x],
-
             [-self.x, self.z, self.y],
             [-self.x, self.y, -self.z],
             [-self.x, -self.z, -self.y],
@@ -127,7 +124,6 @@ impl Pos {
     fn rev_rot(&self, n: usize) -> Option<Pos> {
         self.rev_rots().nth(n)
     }
-
 }
 
 impl std::ops::Sub for Pos {
@@ -169,10 +165,10 @@ impl Scanner {
                     *which_from,
                     *which_to,
                     *which_rot,
-                    *s2_s1
+                    *s2_s1,
                 )
             })
-            .filter(|(c,_,_,_,_)| *c >= 12)
+            .filter(|(c, _, _, _, _)| *c >= 12)
             .collect();
         matches.sort();
 
@@ -211,7 +207,10 @@ impl Scanner {
     }
 
     pub fn rebase(&self, rot: usize, rel: Pos) -> Vec<Pos> {
-        self.beacons.iter().map(|pos| pos.rev_rot(rot).unwrap() - rel).collect()
+        self.beacons
+            .iter()
+            .map(|pos| pos.rev_rot(rot).unwrap() - rel)
+            .collect()
     }
 }
 
@@ -234,11 +233,11 @@ pub fn part1(input: &Vec<Scanner>) -> usize {
     let (rot, rel) = input[0].most_likely(&input[1]).unwrap();
     println!("{:?}", input[1].beacons);
     println!("{:?}", rel.rot(rot).unwrap());
-    println!("{:?}", Pos{x:0, y:0, z:0} - rel);
+    println!("{:?}", Pos { x: 0, y: 0, z: 0 } - rel);
     let new_scan1 = Scanner {
         beacons: input[1].rebase(rot, rel),
         base: None,
-        rot: None
+        rot: None,
     };
     println!("===");
     println!("{:?}", new_scan1.beacons);
@@ -248,7 +247,7 @@ pub fn part1(input: &Vec<Scanner>) -> usize {
     println!("{:?}", input[4]);
     println!("{:?}", rel2);
     println!("{:?}", rel2.rot(rot2));
-    println!("{:?}", Pos{x:0, y:0, z:0} - rel2);
+    println!("{:?}", Pos { x: 0, y: 0, z: 0 } - rel2);
     println!("---4---");
     println!("{:?}", new_scan4);
 

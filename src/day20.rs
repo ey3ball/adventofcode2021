@@ -9,7 +9,7 @@ pub struct Map {
     ymax: i32,
     codec: HashMap<usize, bool>,
     arr: HashSet<(i32, i32)>,
-    bg: bool
+    bg: bool,
 }
 
 impl Map {
@@ -22,26 +22,23 @@ impl Map {
 
     fn neigh(&self, pt: (i32, i32)) -> Vec<(i32, i32)> {
         (pt.1 - 1..=pt.1 + 1)
-            .flat_map(move |y| {
-                (pt.0 - 1..=pt.0 + 1)
-                    .map(move |x| (x, y))
-            })
+            .flat_map(move |y| (pt.0 - 1..=pt.0 + 1).map(move |x| (x, y)))
             .collect()
     }
 
     fn coords(&self) -> Vec<(i32, i32)> {
-        (self.ymin-1..self.ymax+1)
-            .flat_map(|y| (self.xmin-1..self.xmax+1).map(move |x| (x,y)))
+        (self.ymin - 1..self.ymax + 1)
+            .flat_map(|y| (self.xmin - 1..self.xmax + 1).map(move |x| (x, y)))
             .collect()
     }
 
     fn debug(&self) {
         println!("map");
-        for y in self.ymin-4..self.ymax+4 {
+        for y in self.ymin - 4..self.ymax + 4 {
             println!(
                 "{}",
-                ((self.xmin-4..self.xmax+4)
-                    .map(|x| self.val((x,y)))
+                ((self.xmin - 4..self.xmax + 4)
+                    .map(|x| self.val((x, y)))
                     .map(|v| if v { '#' } else { '.' })
                     .collect::<String>())
             )
@@ -57,12 +54,11 @@ impl Map {
     }
 
     fn coeff(&self, pt: (i32, i32)) -> usize {
-        return self.neigh(pt)
+        return self
+            .neigh(pt)
             .iter()
             .map(|pt| self.val(*pt))
-            .fold(0usize, |val, bits| {
-                val << 1 | if bits { 1 } else { 0 }
-            })
+            .fold(0usize, |val, bits| val << 1 | if bits { 1 } else { 0 });
     }
 }
 
@@ -82,7 +78,13 @@ pub fn generator(input: &str) -> Map {
         .lines()
         .enumerate()
         .flat_map(|(y, l)| l.chars().enumerate().map(move |(x, c)| (x, y, c)))
-        .filter_map(|(x,y,c)| if c == '#' { Some((x as i32,y as i32)) } else { None })
+        .filter_map(|(x, y, c)| {
+            if c == '#' {
+                Some((x as i32, y as i32))
+            } else {
+                None
+            }
+        })
         .collect();
 
     Map {
@@ -92,7 +94,7 @@ pub fn generator(input: &str) -> Map {
         ymin: 0,
         codec,
         arr: map,
-        bg: false
+        bg: false,
     }
 }
 
@@ -100,8 +102,8 @@ pub fn generator(input: &str) -> Map {
 pub fn part1(input: &Map) -> usize {
     let mut image = input.clone();
     image.debug();
-    println!("{}", image.coeff((1,2)));
-    println!("{}", image.codec.get(&image.coeff((1,2))).unwrap());
+    println!("{}", image.coeff((1, 2)));
+    println!("{}", image.codec.get(&image.coeff((1, 2))).unwrap());
     for _i in 0..2 {
         let transform = image
             .coords()
@@ -158,4 +160,3 @@ pub fn part2(input: &Map) -> usize {
 
     image.arr.iter().count()
 }
-

@@ -8,7 +8,6 @@ use core::ops::RangeInclusive;
 const TARGET_X: RangeInclusive<isize> = 235..=259;
 const TARGET_Y: RangeInclusive<isize> = -118..=-62;
 
-
 pub fn reaches_area(dx: isize, dy: isize) -> Option<isize> {
     let mut pos = (0, 0);
     let mut d = (dx, dy);
@@ -29,7 +28,7 @@ pub fn reaches_area(dx: isize, dy: isize) -> Option<isize> {
             d.0 += 1;
         }
         d.1 -= 1;
-    };
+    }
     None
 }
 
@@ -39,7 +38,7 @@ pub fn part1(_input: &str) -> isize {
     let try_y = -1000..1000;
 
     try_x
-        .flat_map(|dx| try_y.clone().map(move |dy| (dx,dy)))
+        .flat_map(|dx| try_y.clone().map(move |dy| (dx, dy)))
         .filter_map(|xy| reaches_area(xy.0, xy.1))
         .max()
         .unwrap()
@@ -51,9 +50,7 @@ pub fn part2(_input: &str) -> usize {
     let try_y = -1000..1000;
 
     try_x
-        .flat_map(|dx| try_y.clone().map(move |dy| (dx,dy)))
+        .flat_map(|dx| try_y.clone().map(move |dy| (dx, dy)))
         .filter_map(|xy| reaches_area(xy.0, xy.1))
         .count()
 }
-
-
