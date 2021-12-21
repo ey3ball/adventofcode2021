@@ -2,6 +2,8 @@ extern crate aoc_runner;
 extern crate lazy_static;
 #[macro_use]
 extern crate aoc_runner_derive;
+#[macro_use]
+extern crate itertools;
 
 pub mod day01;
 pub mod day02;
