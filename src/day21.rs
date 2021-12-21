@@ -5,7 +5,7 @@ use std::collections::HashSet;
 //const START_POSITIONS: (i64, i64) = (4, 8);
 const START_POSITIONS: (i64, i64) = (1, 2);
 
-pub fn play(dice: &Vec<i64>, pos: &mut i64, score: &mut i64) {
+pub fn play(dice: &[i64], pos: &mut i64, score: &mut i64) {
     *pos += dice.iter().sum::<i64>();
     *pos = ((*pos - 1) % 10) + 1;
     *score += *pos;
@@ -21,7 +21,7 @@ pub fn part1(_input: &str) -> i64 {
     let mut final_state = (0, 0);
     for draw in &roll.into_iter().chunks(3) {
         let draw: Vec<(usize, i64)> = draw.collect();
-        let drawn = draw.iter().map(|(_, die)| *die).collect();
+        let drawn: Vec<_> = draw.iter().map(|(_, die)| *die).collect();
         if player == 0 {
             play(&drawn, &mut pos.0, &mut scores.0);
             player = 1;
@@ -82,7 +82,7 @@ pub fn multiplay(states: &mut StatePaths, cur: &State, rolls: &HashMap<i64, usiz
 
             *states
                 .entry(next_state)
-                .or_insert(HashMap::new())
+                .or_insert_with(HashMap::new)
                 .entry(new_pos)
                 .or_insert(0) += repetitions * path_count;
         }
@@ -113,7 +113,7 @@ pub fn part2(_input: &str) -> usize {
                 .partial_cmp(&(s2.scores.0 + s2.scores.1))
                 .unwrap()
         });
-        if state.len() == 0 {
+        if state.is_empty() {
             break;
         }
         let state = state[0].clone();

@@ -11,13 +11,13 @@ type Bingo = (Vec<u32>, Vec<Card>);
 
 impl Card {
     fn new(grid: Vec<u32>, rows: usize, cols: usize) -> Card {
-        return Card {
+        Card {
             rows,
             cols,
             check: vec![false; grid.len()],
             grid,
             win: None,
-        };
+        }
     }
 
     fn coords(&self, index: usize) -> (usize, usize) {
@@ -66,10 +66,10 @@ pub fn generator(input: &str) -> Bingo {
     lines.next();
 
     let cols = lines.clone().next().unwrap().split_whitespace().count();
-    let rows = lines.clone().take_while(|&r| r != "").count();
+    let rows = lines.clone().take_while(|&r| !r.is_empty()).count();
 
     let cards: Vec<Card> = lines
-        .filter(|&r| r != "")
+        .filter(|&r| !r.is_empty())
         .collect::<Vec<&str>>()
         .chunks(rows)
         .map(|card| {

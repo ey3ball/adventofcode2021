@@ -129,7 +129,7 @@ pub fn part1(input: &Map) -> usize {
         image.debug();
     }
 
-    image.arr.iter().count()
+    image.arr.len()
 }
 
 #[aoc(day20, part2)]
@@ -158,5 +158,5 @@ pub fn part2(input: &Map) -> usize {
         }
     }
 
-    image.arr.iter().count()
+    image.arr.len()
 }

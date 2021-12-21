@@ -6,9 +6,9 @@ pub fn parse(input: &str) -> Caves {
     caves.insert("end", vec![]);
     input.lines().for_each(|l| {
         let (from, to) = l.split_once("-").unwrap();
-        caves.entry(from).or_insert(vec![]).push(to);
+        caves.entry(from).or_insert_with(Vec::new).push(to);
         if to != "end" && from != "start" {
-            caves.entry(to).or_insert(vec![]).push(from);
+            caves.entry(to).or_insert_with(Vec::new).push(from);
         }
     });
     caves
@@ -40,7 +40,7 @@ pub fn explore<'a>(input: &'a Caves, twice: bool) -> Vec<Vec<&'a str>> {
                         } else {
                             *detour_taken
                         };
-                        new_path.push(valid_next.clone());
+                        new_path.push(*valid_next);
                         next_paths.push((detour, new_path));
                     });
             }

@@ -98,11 +98,11 @@ pub fn part2(input: &HeightMap) -> usize {
             let mut basin = HashSet::new();
             basin.insert(pt);
             basin = grow(input, basin);
-            basin.iter().count()
+            basin.len()
         })
         .collect();
 
-    basin_sizes.sort();
+    basin_sizes.sort_unstable();
 
     basin_sizes.iter().rev().take(3).product()
 }

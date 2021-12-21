@@ -20,7 +20,7 @@ impl OctoMap {
         &self.arr[self.idx(pt)]
     }
 
-    fn inc(&mut self, pt: (i32, i32)) -> () {
+    fn inc(&mut self, pt: (i32, i32)) {
         let idx = self.idx(pt);
         self.arr[idx] += 1
     }
@@ -106,7 +106,7 @@ pub fn step(n_1: &OctoMap) -> (usize, OctoMap) {
         .filter(|energy| **energy > 9)
         .for_each(|energy| *energy = 0);
 
-    (flashed.iter().count(), n)
+    (flashed.len(), n)
 }
 
 #[aoc(day11, part1)]

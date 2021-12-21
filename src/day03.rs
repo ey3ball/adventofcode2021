@@ -1,7 +1,7 @@
 #[aoc_generator(day3)]
 pub fn generator(input: &str) -> (u32, Vec<u32>) {
     (
-        input.lines().nth(0).unwrap().len() as u32,
+        input.lines().next().unwrap().len() as u32,
         input
             .lines()
             .map(|x| u32::from_str_radix(x, 2).unwrap())

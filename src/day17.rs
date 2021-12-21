@@ -1,4 +1,5 @@
 use core::ops::RangeInclusive;
+use std::cmp::Ordering;
 
 //const TARGET_X: RangeInclusive<isize> = 20..=30;
 //const TARGET_Y: RangeInclusive<isize> = -10..=-5;
@@ -12,7 +13,7 @@ pub fn reaches_area(dx: isize, dy: isize) -> Option<isize> {
     let mut pos = (0, 0);
     let mut d = (dx, dy);
     let mut ymax = 0;
-    while pos.0 <= TARGET_X.last().unwrap() && pos.1 >= TARGET_Y.clone().nth(0).unwrap() {
+    while pos.0 <= TARGET_X.last().unwrap() && pos.1 >= TARGET_Y.clone().next().unwrap() {
         if pos.1 > ymax {
             ymax = pos.1;
         }
@@ -22,10 +23,10 @@ pub fn reaches_area(dx: isize, dy: isize) -> Option<isize> {
         }
 
         pos = (pos.0 + d.0, pos.1 + d.1);
-        if d.0 > 0 {
-            d.0 -= 1;
-        } else if d.0 < 0 {
-            d.0 += 1;
+        match d.0.cmp(&0) {
+            Ordering::Greater => d.0 -= 1,
+            Ordering::Less => d.0 += 1,
+            _ => (),
         }
         d.1 -= 1;
     }

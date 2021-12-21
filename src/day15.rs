@@ -77,11 +77,8 @@ pub fn explore(input: &Cavern) -> i32 {
     to_visit.push((0, 0));
     dst.insert(0, Some(0));
 
-    loop {
-        let (from_risk, next_point) = match to_visit.pop() {
-            Some(risk_point) => (-risk_point.0, risk_point.1),
-            _ => break,
-        };
+    while let Some(risk_point) = to_visit.pop() {
+        let (from_risk, next_point) = (-risk_point.0, risk_point.1);
 
         if next_point == input.arr.len() - 1 {
             break;

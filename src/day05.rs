@@ -11,7 +11,7 @@ pub struct Lines {
 }
 
 impl Lines {
-    fn new(coords: Vec<i32>) -> Lines {
+    fn new(coords: &[i32]) -> Lines {
         let eq_slope = (coords[3] - coords[1], coords[2] - coords[0]);
         let eq_origin = if eq_slope.1 == 0 {
             0
@@ -40,7 +40,7 @@ impl Lines {
     }
 
     fn is_straight(&self) -> bool {
-        return self.eq_slope.0 == 0 || self.eq_slope.1 == 0;
+        self.eq_slope.0 == 0 || self.eq_slope.1 == 0
     }
 
     fn trace(&self) -> Vec<Coords> {
@@ -68,17 +68,17 @@ pub fn generator(input: &str) -> Vec<Lines> {
         .map(|l| {
             let c = re.captures(l).unwrap();
             Lines::new(
-                c.iter()
+                &c.iter()
                     .skip(1)
                     .map(|c| c.unwrap().as_str().parse().unwrap())
-                    .collect(),
+                    .collect::<Vec<_>>(),
             )
         })
         .collect()
 }
 
 #[aoc(day5, part1)]
-pub fn part1(lines: &Vec<Lines>) -> usize {
+pub fn part1(lines: &[Lines]) -> usize {
     let mut map: HashMap<Coords, u32> = HashMap::new();
 
     for l in lines.iter().filter(|l| l.is_straight()) {
@@ -91,7 +91,7 @@ pub fn part1(lines: &Vec<Lines>) -> usize {
 }
 
 #[aoc(day5, part2)]
-pub fn part2(lines: &Vec<Lines>) -> usize {
+pub fn part2(lines: &[Lines]) -> usize {
     let mut map: HashMap<Coords, u32> = HashMap::new();
 
     for l in lines.iter() {

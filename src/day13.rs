@@ -11,7 +11,7 @@ pub fn display(grid: &HashSet<(i32, i32)>) {
             .collect();
         println!("{}", row);
     }
-    println!("");
+    println!();
 }
 
 #[aoc_generator(day13)]
@@ -28,7 +28,7 @@ pub fn parse(input: &str) -> Parsed {
         .lines()
         .map(|i| {
             let (axis, value) = i[11..].split_once("=").unwrap();
-            (axis.chars().nth(0).unwrap(), value.parse().unwrap())
+            (axis.chars().next().unwrap(), value.parse().unwrap())
         })
         .collect();
     (dots, instructions)
@@ -57,9 +57,9 @@ pub fn paperfold(sheet: &HashSet<(i32, i32)>, axis: char, value: i32) -> HashSet
 }
 
 #[aoc(day13, part1)]
-pub fn part1(input: &Parsed) -> i32 {
+pub fn part1(input: &Parsed) -> usize {
     let sheet = paperfold(&input.0, input.1[0].0, input.1[0].1);
-    sheet.iter().count() as i32
+    sheet.len()
 }
 
 #[aoc(day13, part2)]

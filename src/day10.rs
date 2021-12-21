@@ -25,7 +25,7 @@ pub fn score_auto(c: char) -> usize {
     }
 }
 
-pub fn parse(line: &Vec<char>) -> Result<Vec<char>, usize> {
+pub fn parse(line: &[char]) -> Result<Vec<char>, usize> {
     let closed_by: HashMap<char, char> = HashMap::from_iter(
         [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')]
             .iter()
@@ -66,17 +66,18 @@ pub fn parse(line: &Vec<char>) -> Result<Vec<char>, usize> {
 }
 
 #[aoc(day10, part1)]
-pub fn part1(input: &Vec<Vec<char>>) -> usize {
+pub fn part1(input: &[Vec<char>]) -> usize {
     input
         .iter()
-        .map(|l| parse(l))
+        .map(|vec| &vec[..])
+        .map(parse)
         .filter(|p| p.is_err())
         .map(|p| p.unwrap_err())
         .sum()
 }
 
 #[aoc(day10, part2)]
-pub fn part2(input: &Vec<Vec<char>>) -> usize {
+pub fn part2(input: &[Vec<char>]) -> usize {
     let closed_by: HashMap<char, char> = HashMap::from_iter(
         [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')]
             .iter()
@@ -85,7 +86,8 @@ pub fn part2(input: &Vec<Vec<char>>) -> usize {
 
     let mut scores: Vec<usize> = input
         .iter()
-        .map(|l| parse(l))
+        .map(|vec| &vec[..])
+        .map(parse)
         .filter(|p| p.is_ok())
         .map(|p| {
             let state = p.unwrap();

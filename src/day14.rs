@@ -11,8 +11,8 @@ pub fn generator(input: &str) -> Input {
         .lines()
         .map(|l| {
             let (from, to) = l.split_once(" -> ").unwrap();
-            let from = (from.chars().nth(0).unwrap(), from.chars().nth(1).unwrap());
-            let to = to.chars().nth(0).unwrap();
+            let from = (from.chars().next().unwrap(), from.chars().nth(1).unwrap());
+            let to = to.chars().next().unwrap();
             (from, to)
         })
         .collect();
@@ -20,11 +20,11 @@ pub fn generator(input: &str) -> Input {
     (init, rules)
 }
 
-pub fn stats(polymer: &Vec<char>) -> usize {
+pub fn stats(polymer: &[char]) -> usize {
     let mut stats: Vec<(char, usize)> = polymer.iter().counts_by(|x| *x).into_iter().collect();
     stats.sort_by(|(_, count), (_, count_2)| count.partial_cmp(count_2).unwrap());
     // println!("{:?}", stats);
-    stats.iter().last().unwrap().1 - stats.iter().next().unwrap().1
+    stats.iter().last().unwrap().1 - stats[0].1
 }
 
 pub fn stats2(first: char, seqs: &HashMap<(char, char), usize>) -> usize {
@@ -36,7 +36,7 @@ pub fn stats2(first: char, seqs: &HashMap<(char, char), usize>) -> usize {
     let mut stats: Vec<(char, usize)> = stats.iter().map(|(k, v)| (*k, *v)).collect();
     stats.sort_by(|(_, count), (_, count_2)| count.partial_cmp(count_2).unwrap());
     // println!("{:?}", stats);
-    stats.iter().last().unwrap().1 - stats.iter().next().unwrap().1
+    stats.iter().last().unwrap().1 - stats[0].1
 }
 
 #[aoc(day14, part1)]

@@ -158,7 +158,7 @@ impl Scanner {
                     other
                         .rebase(*which_rot, *s2_s1)
                         .iter()
-                        .filter(|ob| self.beacons.contains(&ob))
+                        .filter(|ob| self.beacons.contains(ob))
                         .count(),
                     *which_from,
                     *which_to,
@@ -174,7 +174,7 @@ impl Scanner {
             println!("=:{} b1:{} b2:{} rot:{} d:{:?}", m.0, m.1, m.2, m.3, m.4);
         }
 
-        if matches.len() > 0 {
+        if matches.is_empty() {
             let m = matches[0];
             println!("=:{} b1:{} b2:{} rot:{}", m.0, m.1, m.2, m.3);
             Some((m.3, m.4))
@@ -213,7 +213,7 @@ impl Scanner {
 }
 
 #[aoc(day19, part1)]
-pub fn part1(input: &Vec<Scanner>) -> usize {
+pub fn part1(input: &[Scanner]) -> usize {
     let (rot, rel) = input[0].most_likely(&input[1]).unwrap();
     println!("{:?}", input[1].beacons);
     println!("{:?}", rel.rot(rot).unwrap());
