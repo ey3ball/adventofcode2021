@@ -56,7 +56,7 @@ type StatePaths = HashMap<State, PosPaths>;
 pub fn multiplay(states: &mut StatePaths, cur: &State, rolls: &HashMap<i64, usize>) {
     let from_paths = match states.get(cur) {
         None => return,
-        Some(path) => path.clone()
+        Some(path) => path.clone(),
     };
 
     for (pos, path_count) in from_paths.iter() {
@@ -73,8 +73,11 @@ pub fn multiplay(states: &mut StatePaths, cur: &State, rolls: &HashMap<i64, usiz
             };
 
             let next_state = State {
-                scores: (cur.scores.0 + inc_score.0 as usize , cur.scores.1 + inc_score.1 as usize),
-                player: (1 + cur.player) % 2
+                scores: (
+                    cur.scores.0 + inc_score.0 as usize,
+                    cur.scores.1 + inc_score.1 as usize,
+                ),
+                player: (1 + cur.player) % 2,
             };
 
             *states
@@ -100,12 +103,16 @@ pub fn part2(_input: &str) -> usize {
             scores: (0, 0),
             player: 0,
         },
-        [(START_POSITIONS, 1usize)].iter().copied().collect()
+        [(START_POSITIONS, 1usize)].iter().copied().collect(),
     );
 
     loop {
         let mut state: Vec<&State> = states.keys().filter(|k| !visited.contains(k)).collect();
-        state.sort_by(|s1, s2| (s1.scores.0 + s1.scores.1).partial_cmp(&(s2.scores.0 + s2.scores.1)).unwrap());
+        state.sort_by(|s1, s2| {
+            (s1.scores.0 + s1.scores.1)
+                .partial_cmp(&(s2.scores.0 + s2.scores.1))
+                .unwrap()
+        });
         if state.len() == 0 {
             break;
         }
@@ -121,19 +128,17 @@ pub fn part2(_input: &str) -> usize {
         visited.insert(state);
     }
 
-    let p1_winners: usize =
-        states
-            .iter()
-            .filter(|(k, v)| k.scores.0 >= 21)
-            .map(|(_, v)| v.values().sum::<usize>())
-            .sum();
+    let p1_winners: usize = states
+        .iter()
+        .filter(|(k, v)| k.scores.0 >= 21)
+        .map(|(_, v)| v.values().sum::<usize>())
+        .sum();
 
-    let p2_winners: usize =
-        states
-            .iter()
-            .filter(|(k, v)| k.scores.1 >= 21)
-            .map(|(_, v)| v.values().sum::<usize>())
-            .sum();
+    let p2_winners: usize = states
+        .iter()
+        .filter(|(k, v)| k.scores.1 >= 21)
+        .map(|(_, v)| v.values().sum::<usize>())
+        .sum();
 
     std::cmp::max(p1_winners, p2_winners)
 }
