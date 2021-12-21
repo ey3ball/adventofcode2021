@@ -130,13 +130,13 @@ pub fn part2(_input: &str) -> usize {
 
     let p1_winners: usize = states
         .iter()
-        .filter(|(k, v)| k.scores.0 >= 21)
+        .filter(|(k, _)| k.scores.0 >= 21)
         .map(|(_, v)| v.values().sum::<usize>())
         .sum();
 
     let p2_winners: usize = states
         .iter()
-        .filter(|(k, v)| k.scores.1 >= 21)
+        .filter(|(k, _)| k.scores.1 >= 21)
         .map(|(_, v)| v.values().sum::<usize>())
         .sum();
 

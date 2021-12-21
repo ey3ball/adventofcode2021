@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Pos {
     x: i64,
@@ -216,20 +214,6 @@ impl Scanner {
 
 #[aoc(day19, part1)]
 pub fn part1(input: &Vec<Scanner>) -> usize {
-    let mut scanners = input.clone();
-    let found: Vec<Scanner> = vec![];
-    let process = vec![scanners[0].clone()];
-    let mut others: Vec<Scanner> = scanners[1..].iter().cloned().collect();
-
-    //while !others.is_empty() {
-    //    for p in process.iter() {
-    //        others
-    //            .iter_mut()
-    //            .filter_map(|o| p.most_likely(o).map(|r| (o,r)))
-    //            ;
-    //    }
-    //}
-
     let (rot, rel) = input[0].most_likely(&input[1]).unwrap();
     println!("{:?}", input[1].beacons);
     println!("{:?}", rel.rot(rot).unwrap());

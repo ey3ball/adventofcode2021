@@ -30,7 +30,7 @@ pub fn stats(polymer: &Vec<char>) -> usize {
 pub fn stats2(first: char, seqs: &HashMap<(char, char), usize>) -> usize {
     let mut stats: HashMap<char, usize> = HashMap::new();
     stats.insert(first, 1);
-    seqs.iter().for_each(|((a, b), count)| {
+    seqs.iter().for_each(|((_, b), count)| {
         *(stats.entry(*b).or_insert(0)) += count;
     });
     let mut stats: Vec<(char, usize)> = stats.iter().map(|(k, v)| (*k, *v)).collect();

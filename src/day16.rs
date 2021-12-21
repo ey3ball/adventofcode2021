@@ -1,6 +1,4 @@
-use nom::bits::{bits, complete::tag, complete::take};
-use nom::bytes;
-use nom::error::Error;
+use nom::bits::{bits, complete::take};
 use nom::IResult;
 
 type ParseState<'a> = (&'a [u8], usize);
@@ -19,6 +17,7 @@ pub enum PacketOp {
 }
 
 impl Packet {
+    #[cfg(test)]
     fn literal(version: usize, val: u64) -> Packet {
         Packet {
             version,
@@ -27,6 +26,7 @@ impl Packet {
         }
     }
 
+    #[cfg(test)]
     fn op(version: usize, packets: Vec<Packet>) -> Packet {
         Packet {
             version,

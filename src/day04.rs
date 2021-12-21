@@ -110,7 +110,6 @@ pub fn part2((draw, cards): &Bingo) -> u32 {
     let mut cards = cards.clone();
     let mut bag = draw.iter();
     let mut drawn = 0;
-    let last: Option<Card> = None;
 
     while cards.len() != 1 {
         drawn = *bag.next().unwrap();

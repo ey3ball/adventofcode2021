@@ -21,11 +21,6 @@ impl Cavern {
         &self.arr[self.idx(pt)]
     }
 
-    fn inc(&mut self, pt: (i32, i32)) -> () {
-        let idx = self.idx(pt);
-        self.arr[idx] += 1
-    }
-
     fn neigh(&self, pt: (i32, i32)) -> Vec<(i32, i32)> {
         [(1, 0), (-1, 0), (0, 1), (0, -1)]
             .iter()
@@ -39,6 +34,7 @@ impl Cavern {
         self.neigh(pt)
     }
 
+    #[allow(dead_code)]
     fn debug(&self) {
         println!("map");
         for y in 0..self.ymax {

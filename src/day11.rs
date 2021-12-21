@@ -113,7 +113,7 @@ pub fn step(n_1: &OctoMap) -> (usize, OctoMap) {
 pub fn part1(input: &OctoMap) -> usize {
     let mut flash = 0;
     let mut map = input.clone();
-    for i in 0..100 {
+    for _i in 0..100 {
         map.debug();
         let (inc, new_map) = step(&map);
         map = new_map;
@@ -124,7 +124,6 @@ pub fn part1(input: &OctoMap) -> usize {
 
 #[aoc(day11, part2)]
 pub fn part2(input: &OctoMap) -> usize {
-    let mut flash = 0;
     let mut map = input.clone();
     let mut final_step = 0;
     for steps in 0..10000 {
@@ -135,7 +134,6 @@ pub fn part2(input: &OctoMap) -> usize {
             final_step = steps;
             break;
         }
-        flash += inc
     }
     final_step
 }
