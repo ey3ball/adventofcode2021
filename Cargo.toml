@@ -5,6 +5,7 @@ authors = ["Florian Vallée <florian@vallee.xyz>"]
 edition = "2021"
 
 [dependencies]
+dynasmrt = "*"
 aoc-runner = "*" 
 aoc-runner-derive = "*"
 #counter = "0.5.2"
